@@ -28,8 +28,7 @@ const userRoutes = require('./routes/user');
 
 const MongoDBStore = require("connect-mongo");
 
-// const dbUrl = process.env.DB_URL;
-const dbUrl = 'mongodb://localhost:27017/yelp-camp';
+const dbUrl = process.env.DB_URL || 'mongodb://localhost:27017/yelp-camp';
 
 mongoose.set('strictQuery', false);
 
@@ -60,11 +59,13 @@ app.use(mongoSanitize({
     replaceWith: '_' //perlu dicari tahu kenapa direplace jadi '_'
 }));
 
+const secret = process.env.SECRET || 'thisshouldbebettersecret!';
+
 const store = MongoDBStore.create({
     mongoUrl: dbUrl,
     touchAfter: 24 * 60 * 60,
     crypto: {
-        secret: 'thisshouldbebettersecret!'
+        secret
     }
 });
 
@@ -75,7 +76,7 @@ store.on("error", function (e) {
 const sessionConfig = {
     store,
     name: 'session', //session name on cookie
-    secret: 'thisshouldbebettersecret!',
+    secret,
     resave: false,
     saveUninitialized: true,
     cookie: {
